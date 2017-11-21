@@ -1,0 +1,30 @@
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
+
+//图像逆时针旋转90°
+//先对图像进行转置，再上下颠倒，快捷地进行旋转，但只能用于旋转读书为90°整数倍的旋转
+
+int main()
+{
+	Mat srcImage = imread("C:\\Users\\LIUU\\Pictures\\dlc.jpg");
+	imshow("dd", srcImage);
+
+	srcImage=srcImage.t();
+	Mat dstImage(srcImage.size(), srcImage.type());
+	Mat map_x(srcImage.size(), CV_32FC1);
+	Mat map_y(srcImage.size(), CV_32FC1);
+	for (int i = 0; i < srcImage.rows; i++)
+	{
+		for (int j = 0 ; j < srcImage.cols; j++)
+		{
+			map_x.at<float>(i, j) = static_cast<float>(j);
+			map_y.at<float>(i, j) = static_cast<float>(srcImage.rows - i);
+		}
+	}
+	remap(srcImage, dstImage, map_x, map_y, INTER_LINEAR);    //重映射
+	
+	imshow("aa", dstImage);
+
+	waitKey(0);
+}
