@@ -1,0 +1,33 @@
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+using namespace cv;
+
+int main()
+{
+	Mat srcImage = imread("C:\\Users\\LIUU\\Pictures\\dlc.jpg");
+	imshow("dd", srcImage);
+
+	//图像逆时针旋转90°
+	//resize(srcImage, srcImage, Size(srcImage.cols / 8, srcImage.rows / 8));
+
+	Point2f center = Point2f(srcImage.cols / 2, srcImage.rows / 2);
+	double angle = 45;
+	double scale = (double)1.0;
+
+	//根据旋转中心、角度、缩放比例自动获得相应的旋转矩阵
+	Mat rotMat = getRotationMatrix2D(center, angle, scale);
+	//构建旋转后图片展示窗口的尺寸
+	Rect box = RotatedRect(center, srcImage.size(), angle).boundingRect();     //RotatedRect是获取旋转矩形的区域，boundingRect()获取该区域的最小外接矩形
+	
+	//旋转矩阵大小为2x3，最后一列表示旋转后的位移，用getRotationMatrix2D获得的矩阵进行旋转时会使中心点跑偏，
+	//通过改变最后一列的值，强制使旋转图像的中心点与展示窗口的中心点重合
+	rotMat.at<double>(0, 2) += box.width / 2.0 - center.x;
+	rotMat.at<double>(1, 2) += box.height / 2.0 - center.y;
+
+	//仿射变换
+	warpAffine(srcImage, srcImage, rotMat, box.size());
+
+	imshow("aa", srcImage);
+	waitKey(0);
+}
